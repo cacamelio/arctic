@@ -5,6 +5,7 @@ namespace Miscellaneous {
 	void FastThrow();
 	void FastSwitch();
 	void AutomaticGrenadeRelease();
+	void AntiAFKKick();
 	void PreserveKillfeed();
 	void ClearKillfeed();
 	void RadarAngles();

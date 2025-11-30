@@ -297,6 +297,36 @@ void CRagebot::SelectRecords(CBasePlayer* player, std::queue<LagRecord*>& target
 		if (!last_record->shifting_tickbase && !last_record->invalid)
 			target_records.push(last_record);
 	}
+
+	
+	/*if (target_records.empty()) {
+	auto last_record = &records.back();
+		
+		if (!last_record->shifting_tickbase && !last_record->invalid) {
+			int pred_ticks = 0;
+
+			if (INetChannelInfo* nci = EngineClient->GetNetChannelInfo()) {
+				float latency = nci->GetLatency(FLOW_INCOMING) + nci->GetLatency(FLOW_OUTGOING);
+				pred_ticks += TIME_TO_TICKS(latency);
+			}
+
+			int ticks_since_update = GlobalVars->tickcount - last_record->update_tick;
+			if (ticks_since_update > 0)
+				pred_ticks += ticks_since_update;
+
+			if (pred_ticks > 0) {
+				LagRecord* extrapolated = LagCompensation->ExtrapolateRecord(last_record, pred_ticks);
+				target_records.push(extrapolated);
+			}
+			else {
+				target_records.push(last_record);
+			}
+
+		}
+
+	}*/
+	
+
 }
 
 void CRagebot::AddPoint(AimPoint_t&& point) {
@@ -762,7 +792,7 @@ void CRagebot::Run() {
 		float jump_max_hc = FastHitchance(target.best_point.record, min_jump_inaccuracy_tan);
 
 		if (target.best_point.damage > target.minimum_damage && ctx.cmd->command_number - last_target_shot < 256 && target.player == last_target) {
-			if (target.hitchance > hitchance) {
+			if (target.hitchance >= hitchance) {
 				best_target = target;
 				should_autostop = true;
 				break;
@@ -772,7 +802,7 @@ void CRagebot::Run() {
 			}
 		}
 
-		if (target.hitchance > hitchance && target.best_point.damage > max(best_target.best_point.damage, target.minimum_damage))
+		if (target.hitchance >= hitchance && target.best_point.damage > max(best_target.best_point.damage, target.minimum_damage))
 			best_target = target;
 
 		if (target.best_point.damage > target.minimum_damage) {
@@ -787,7 +817,7 @@ void CRagebot::Run() {
 			if (settings.auto_stop->get(0) && (local_on_ground || (settings.auto_stop->get(2) && jump_max_hc >= hitchance)) && target.best_point.damage > target.minimum_damage * 0.4f)
 				should_autostop = true;
 
-			Exploits->block_charge = true;
+			Exploits->block_charge = local_on_ground;
 		}
 	}
 
@@ -974,7 +1004,7 @@ void CRagebot::Knifebot() {
 				continue;
 			}
 
-			Exploits->block_charge = true;
+			Exploits->block_charge = Cheat.LocalPlayer->m_fFlags() & FL_ONGROUND && EnginePrediction->pre_prediction.m_fFlags & FL_ONGROUND;
 
 			Vector vTragetForward = Math::AngleVectors(QAngle(0, record->m_angEyeAngles.yaw));
 			vTragetForward.z = 0.f;

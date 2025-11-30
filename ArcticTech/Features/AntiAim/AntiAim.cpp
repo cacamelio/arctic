@@ -22,7 +22,8 @@ void CAntiAim::FakeLag() {
 		return;
 	}
 
-	if (Exploits->GetExploitType() == CExploits::E_DoubleTap && ctx.tickbase_shift && ctx.cmd->buttons & IN_USE && !ctx.planting_bomb)
+	auto exploit_type = Exploits->GetExploitType();
+	if ((exploit_type == CExploits::E_DoubleTap || exploit_type == CExploits::E_HideShots) && ctx.tickbase_shift && ctx.cmd->buttons & IN_USE && !ctx.planting_bomb)
 		return;
 
 	fakelag = 0;
@@ -31,11 +32,14 @@ void CAntiAim::FakeLag() {
 	if (ctx.tickbase_shift > 0)
 		fakelag_limit = max((cvars.sv_maxusrcmdprocessticks->GetInt() - 1) - ctx.tickbase_shift, 1);
 
-	if (config.ragebot.aimbot.doubletap->get() && (GlobalVars->realtime - ctx.last_shot_time) < 0.2f)
-		fakelag_limit = 2;
+	if (exploit_type == CExploits::E_DoubleTap && (GlobalVars->realtime - ctx.last_shot_time) < 0.2f)
+		fakelag_limit = min(fakelag_limit, 2);
+
+	else if (exploit_type == CExploits::E_HideShots && ctx.tickbase_shift > 0)
+		fakelag_limit = min(fakelag_limit, 1);
 
 	if (config.antiaim.fakelag.enabled->get()) {
-		if (Cheat.LocalPlayer->m_vecVelocity().LengthSqr() < 4096.f) {
+		if (Cheat.LocalPlayer->m_vecVelocity().LengthSqr() < 1.3f) { // standing still
 			fakelag = 1;
 		} else {
 			fakelag = fakelag_limit;
@@ -44,6 +48,8 @@ void CAntiAim::FakeLag() {
 				fakelag -= Utils::RandomInt(0, config.antiaim.fakelag.variability->get());
 		}
 	}
+	else if(config.antiaim.angles.body_yaw->get())
+		fakelag = 1;
 
 	if (Cheat.LocalPlayer->m_vecOrigin() - ctx.local_sent_origin > 64.f)
 		fakelag = 1;
@@ -121,8 +127,40 @@ void CAntiAim::Angles() {
 			base_yaw = lua_override.yaw;
 
 		yaw_offset = 0;
-		if (config.antiaim.angles.yaw_jitter->get() && !Cheat.LocalPlayer->m_bIsDefusing() && (!config.antiaim.angles.manual_options->get(0) || manualAngleState == 0))
-			yaw_offset = jitter ? -config.antiaim.angles.modifier_value->get() * 0.5f : config.antiaim.angles.modifier_value->get() * 0.5f;
+		static int tick = 0;
+
+		if (config.antiaim.angles.yaw_jitter->get() && !Cheat.LocalPlayer->m_bIsDefusing() && (!config.antiaim.angles.manual_options->get(0) || manualAngleState == 0)) {
+			switch (config.antiaim.angles.yaw_jitter_type->get())
+			{
+			case 0 : //normal jitter
+				yaw_offset = jitter ? -config.antiaim.angles.modifier_value->get() * 0.5f : config.antiaim.angles.modifier_value->get() * 0.5f;
+				break;
+
+			case 1: { //3way jitter
+				switch (tick) {
+				case 0 :
+					yaw_offset = -config.antiaim.angles.modifier_value->get() * 0.5f;
+					break;
+
+				case 2 :
+					yaw_offset = config.antiaim.angles.modifier_value->get() * 0.5f;
+					break;
+				}
+				break;
+			}
+			case 2: //random jitter
+				yaw_offset = Utils::RandomInt(-config.antiaim.angles.modifier_value->get() * 0.5f, config.antiaim.angles.modifier_value->get() * 0.5f);
+				break;
+
+			default:
+				break;
+			}
+
+
+		}
+
+		++tick;
+		tick %= 3;
 
 		if (lua_override.override_bits & lua_override.OverridePitch)
 			pitch = lua_override.pitch;
@@ -382,6 +420,8 @@ bool CAntiAim::IsPeeking() {
 
 	Vector scan_points[] = {
 		Cheat.LocalPlayer->GetHitboxCenter(HITBOX_HEAD),
+		Cheat.LocalPlayer->GetHitboxCenter(HITBOX_CHEST),
+		Cheat.LocalPlayer->GetHitboxCenter(HITBOX_STOMACH),
 		Cheat.LocalPlayer->GetHitboxCenter(HITBOX_PELVIS),
 		Cheat.LocalPlayer->GetHitboxCenter(HITBOX_LEFT_FOOT),
 		Cheat.LocalPlayer->GetHitboxCenter(HITBOX_RIGHT_FOOT)
@@ -408,7 +448,7 @@ bool CAntiAim::IsPeeking() {
 		if (ctx.active_weapon)
 			ctx.weapon_info = ctx.active_weapon->GetWeaponInfo();
 
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 6; i++) {
 			FireBulletData_t data;
 			if (AutoWall->FireBullet(player, enemyShootPos, scan_points[i], data, Cheat.LocalPlayer) && data.damage > 1.f) {
 				info.m_bHit = true;
@@ -428,7 +468,8 @@ bool CAntiAim::IsPeeking() {
 	//DebugOverlay->AddBoxOverlay(scan_points[1], Vector(-1, -1, -1), Vector(1, 1, 1), QAngle(), r, g, 0, 255, GlobalVars->interval_per_tick * 2);
 	//DebugOverlay->AddBoxOverlay(scan_points[2], Vector(-1, -1, -1), Vector(1, 1, 1), QAngle(), r, g, 0, 255, GlobalVars->interval_per_tick * 2);
 	//DebugOverlay->AddBoxOverlay(scan_points[3], Vector(-1, -1, -1), Vector(1, 1, 1), QAngle(), r, g, 0, 255, GlobalVars->interval_per_tick * 2);
-
+	//DebugOverlay->AddBoxOverlay(scan_points[4], Vector(-1, -1, -1), Vector(1, 1, 1), QAngle(), r, g, 0, 255, GlobalVars->interval_per_tick * 2);
+	//DebugOverlay->AddBoxOverlay(scan_points[5], Vector(-1, -1, -1), Vector(1, 1, 1), QAngle(), r, g, 0, 255, GlobalVars->interval_per_tick * 2);
 
 	ctx.active_weapon = backup_active_weapon;
 	ctx.weapon_info = backup_weapon_data;

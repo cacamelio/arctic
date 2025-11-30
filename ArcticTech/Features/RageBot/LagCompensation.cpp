@@ -116,7 +116,8 @@ void CLagCompensation::OnNetUpdate() {
 		}
 
 		if (prev_record && prev_record->animlayers[ANIMATION_LAYER_ALIVELOOP].m_flCycle == pl->GetAnimlayers()[ANIMATION_LAYER_ALIVELOOP].m_flCycle) {
-			pl->m_flOldSimulationTime() = pl->m_flSimulationTime();
+			//pl->m_flOldSimulationTime() = pl->m_flSimulationTime();
+			pl->m_flSimulationTime() = prev_record->m_flSimulationTime;
 			continue;
 		}
 

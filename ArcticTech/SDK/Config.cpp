@@ -163,6 +163,7 @@ void CConfig::Init() {
     add(config.antiaim.angles.pitch);
     add(config.antiaim.angles.yaw);
     add(config.antiaim.angles.yaw_jitter);
+	add(config.antiaim.angles.yaw_jitter_type);
     add(config.antiaim.angles.modifier_value);
     add(config.antiaim.angles.manual_left);
     add(config.antiaim.angles.manual_right);
@@ -291,6 +292,7 @@ void CConfig::Init() {
     add(config.misc.miscellaneous.anti_untrusted);
     add(config.misc.miscellaneous.ping_reducer);
     add(config.misc.miscellaneous.automatic_grenade_release);
+    add(config.misc.miscellaneous.anti_afk_kick);
     add(config.misc.miscellaneous.logs);
     add(config.misc.miscellaneous.auto_buy);
     add(config.misc.miscellaneous.filter_console);

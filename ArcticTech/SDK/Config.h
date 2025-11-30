@@ -88,6 +88,7 @@ struct config_t {
             CComboBox* pitch;
             CComboBox* yaw;
             CCheckBox* yaw_jitter;
+			CComboBox* yaw_jitter_type;
             CSliderInt* modifier_value;
             CKeyBind* manual_left;
             CKeyBind* manual_right;
@@ -252,6 +253,7 @@ struct config_t {
             CCheckBox* anti_untrusted;
             CCheckBox* ping_reducer;
             CSliderInt* automatic_grenade_release;
+			CCheckBox* anti_afk_kick;
             CMultiCombo* logs;
             CMultiCombo* auto_buy;
             CCheckBox* filter_console;

@@ -282,6 +282,8 @@ public:
 
 	void			Setup();
 	void			SetupUI();
+	void 		    BindsList();
+	void            Watermark();
 	void			Release();
 	void			Draw();
 	bool			WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

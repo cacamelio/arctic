@@ -168,6 +168,15 @@ void Miscellaneous::AutomaticGrenadeRelease() {
 	prev_release = ctx.should_release_grenade;
 }
 
+void Miscellaneous::AntiAFKKick() {
+	if (!Cheat.InGame || !Cheat.LocalPlayer || !config.misc.miscellaneous.anti_afk_kick->get())
+		return;
+
+	if (ctx.cmd->command_number % 2)
+		ctx.cmd->buttons |= 1 << 27;
+
+}
+
 static bool s_ShouldClearNotices = false;
 void Miscellaneous::PreserveKillfeed() {
 	if (!Cheat.InGame || !Cheat.LocalPlayer)

@@ -110,6 +110,9 @@ void __fastcall hkHudUpdate(IBaseClientDLL* thisptr, void* edx, bool bActive) {
 	WorldESP->OtherESP();
 	WorldESP->RenderMarkers();
 
+	Menu->BindsList();
+	Menu->Watermark();
+
 	NadePrediction.Start();
 	NadePrediction.Draw();
 
@@ -206,6 +209,7 @@ void __stdcall CreateMove(int sequence_number, float sample_frametime, bool acti
 	AntiAim->JitterMove();
 	Movement->AutoStrafe();
 	Miscellaneous::AutomaticGrenadeRelease();
+	Miscellaneous::AntiAFKKick();
 	Miscellaneous::FastThrow();
 	Miscellaneous::FastSwitch();
 
@@ -243,7 +247,7 @@ void __stdcall CreateMove(int sequence_number, float sample_frametime, bool acti
 
 	ctx.is_peeking = AntiAim->IsPeeking();
 
-	if (ctx.is_peeking && config.ragebot.aimbot.doubletap_options->get(1))
+	if (ctx.is_peeking && config.ragebot.aimbot.doubletap_options->get(1) && Exploits->GetExploitType() == CExploits::E_DoubleTap )
 		Exploits->DefenseiveThisTick() = true;
 
 	Exploits->AllowDefensive() = lua_cmd.allow_defensive;
