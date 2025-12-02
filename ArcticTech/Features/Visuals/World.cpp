@@ -130,6 +130,7 @@ void CWorld::Fog() {
 }
 
 void CWorld::SkyBox() {
+
 	static auto load_skybox = reinterpret_cast<void(__fastcall*)(const char*)>(Utils::PatternScan("engine.dll", "55 8B EC 81 EC ? ? ? ? 56 57 8B F9 C7 45"));
 
 	if (!Cheat.InGame)
@@ -137,13 +138,64 @@ void CWorld::SkyBox() {
 
 	switch (config.visuals.effects.override_skybox->get()) {
 	case 1:
-		load_skybox("sky_csgo_cloudy01");
+		load_skybox("cs_tibet");
 		break;
 	case 2:
-		load_skybox("sky_csgo_night02");
+		load_skybox("cs_baggage_skybox_");
 		break;
 	case 3:
+		load_skybox("italy");
+		break;
+	case 4:
+		load_skybox("jungle");
+		break;
+	case 5:
+		load_skybox("office");
+		break;
+	case 6:
+		load_skybox("sky_cs15_daylight01_hdr");
+		break;
+	case 7:
+		load_skybox("sky_cs15_daylight02_hdr");
+		break;
+	case 8:
+		load_skybox("vertigoblue_hdr");
+		break;
+	case 9:
+		load_skybox("vertigo");
+		break;
+	case 10:
+		load_skybox("sky_day02_05_hdr");
+		break;
+	case 11:
+		load_skybox("nukeblank");
+		break;
+	case 12:
+		load_skybox("sky_venice");
+		break;
+	case 13:
+		load_skybox("sky_cs15_daylight03_hdr");
+		break;
+	case 14:
+		load_skybox("sky_cs15_daylight04_hdr");
+		break;
+	case 15:
+		load_skybox("sky_csgo_cloudy01");
+		break;
+	case 16:
+		load_skybox("sky_csgo_night02");
+		break;
+	case 17:
 		load_skybox("sky_csgo_night02b");
+		break;
+	case 18:
+		load_skybox("sky_csgo_night_flat");
+		break;
+	case 19:
+		load_skybox("sky_dust");
+		break;
+	case 20:
+		load_skybox("vietnam");
 		break;
 	}
 }

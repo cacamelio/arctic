@@ -689,17 +689,33 @@ CButton* CMenuGroupbox::AddButton(const std::string& name) {
     return item;
 }
 
+//CInputBox* CMenuGroupbox::AddInput(const std::string& name, const std::string& init, ImGuiInputTextFlags flags) {
+//    CInputBox* item = new CInputBox;
+//
+//    item->name = name;
+//    item->parent = this;
+//    item->flags = flags;
+//    
+//    memset(item->buf, 0, 64);
+//    std::memcpy(item->buf, init.c_str(), min(init.size(), 64));
+//
+//    widgets.push_back(item);
+//
+//    return item;
+//}
+
 CInputBox* CMenuGroupbox::AddInput(const std::string& name, const std::string& init, ImGuiInputTextFlags flags) {
     CInputBox* item = new CInputBox;
 
     item->name = name;
     item->parent = this;
     item->flags = flags;
-    
+
     memset(item->buf, 0, 64);
-    std::memcpy(item->buf, init.c_str(), min(init.size(), 64));
+    if (!init.empty()) {
+        strncpy_s(item->buf, init.c_str(), 63);
+    }
 
     widgets.push_back(item);
-
     return item;
 }

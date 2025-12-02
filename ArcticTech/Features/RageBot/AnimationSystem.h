@@ -57,6 +57,7 @@ public:
 	void	InterpolateModel(CBasePlayer* player, matrix3x4_t* matrix);
 	void	ResetInterpolation();
 	void	InvalidateInterpolation(int i);
+	void	InterpolateAngles(CBasePlayer* player, float curTime);
 	inline interpolate_data_t* GetInterpolateData(int idx) { return &interpolate_data[idx]; };
 };
 

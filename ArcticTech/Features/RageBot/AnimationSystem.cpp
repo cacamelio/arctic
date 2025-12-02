@@ -21,6 +21,8 @@ void FixLegMovement(AnimationLayer* server_layers) {
 		return;
 
 	CCSGOPlayerAnimationState* animstate = Cheat.LocalPlayer->GetAnimstate();
+	if (!animstate)
+		return;
 
 	float delta = Math::AngleDiff(ctx.cmd->viewangles.yaw, ctx.leg_slide_angle.yaw);
 	float moveYaw = Math::AngleDiff(Math::VectorAngles(Cheat.LocalPlayer->m_vecVelocity()).yaw, ctx.cmd->viewangles.yaw);
@@ -417,6 +419,42 @@ void CAnimationSystem::ResetInterpolation() {
 
 void CAnimationSystem::InvalidateInterpolation(int i) {
 	interpolate_data[i].valid = false;
+}
+
+//shoutout to uwukson 
+void CAnimationSystem::InterpolateAngles(CBasePlayer* player, float curTime)
+{
+	Vector currentAngles = Math::AngleVectors(player->m_angEyeAngles());
+	Vector currentOrigin = player->GetAbsOrigin();
+
+	static Vector lastAngles;
+	static Vector lastOrigin;
+	static float lastUpdateTime = 0.0f;
+
+	float deltaTime = curTime - lastUpdateTime;
+	float interpolationSpeed = 1.0f / GlobalVars->interval_per_tick;
+
+	if (deltaTime > 0.0f && deltaTime < 1.0f)
+	{
+		Vector angleDelta = currentAngles - lastAngles;
+		for (int i = 0; i < 3; i++)
+		{
+			if (angleDelta[i] > 180.0f)
+				angleDelta[i] -= 360.0f;
+			else if (angleDelta[i] < -180.0f)
+				angleDelta[i] += 360.0f;
+		}
+		Vector interpolatedAngles;
+		interpolatedAngles.x = Math::Lerp(lastAngles.x, currentAngles.x, deltaTime * interpolationSpeed);
+		interpolatedAngles.y = Math::Lerp(lastAngles.y, currentAngles.y, deltaTime * interpolationSpeed);
+		interpolatedAngles.z = Math::Lerp(lastAngles.z, currentAngles.z, deltaTime * interpolationSpeed);
+		player->SetAbsAngles(Math::VectorAngles(interpolatedAngles));
+		matrix3x4_t boneMatrix[128];
+		player->SetupBones(boneMatrix, 128, BONE_USED_BY_ANYTHING, curTime);
+	}
+	lastAngles = currentAngles;
+	lastOrigin = currentOrigin;
+	lastUpdateTime = curTime;
 }
 
 CAnimationSystem* AnimationSystem = new CAnimationSystem;

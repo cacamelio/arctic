@@ -614,7 +614,7 @@ void __fastcall hkUpdateClientSideAnimation(CBasePlayer* thisptr, void* edx) {
 }
 
 bool __fastcall hkShouldSkipAnimationFrame(CBasePlayer* thisptr, void* edx) {
-	if (!thisptr->IsPlayer())
+	if (ClientState->m_nDeltaTick == -1 || !thisptr->IsPlayer() || !thisptr->IsAlive())
 		return oShouldSkipAnimationFrame(thisptr, edx);
 
 	return false;
@@ -1004,8 +1004,12 @@ bool __fastcall hkInterpolatePlayer(CBasePlayer* pl, void* edx, float curTime) {
 	if (pl != Cheat.LocalPlayer || !pl)
 		return oInterpolatePlayer(pl, edx, curTime);
 
-	bool result = oInterpolatePlayer(pl, edx, curTime);
-	return result;
+	if (config.misc.miscellaneous.gamesense_mode->get()) {
+		AnimationSystem->InterpolateAngles(pl, curTime); 
+		return true;
+	}
+
+	return oInterpolatePlayer(pl, edx, curTime);
 }
 
 void __fastcall hkCalcViewModel(CBaseViewModel* vm, void* edx, CBasePlayer* player, const Vector& eyePosition, QAngle& eyeAngles) {

@@ -227,7 +227,7 @@ void CMenu::SetupUI() {
 	config.visuals.effects.server_impacts = effects->AddCheckBox("Server impacts");
 	config.visuals.effects.server_impacts_color = effects->AddColorPicker("Server impacts", Color(0, 0, 255, 125));
 	config.visuals.effects.impacts_duration = effects->AddSliderInt("Duration", 1, 10, 4, "%ds");
-	config.visuals.effects.override_skybox = effects->AddComboBox("Override skybox", { "Disabled", "Night 1", "Night 2", "Night 3" });
+	config.visuals.effects.override_skybox = effects->AddComboBox("Override skybox", { "Disabled", "Tibet", "Baggage", "Italy", "Aztec", "Vertigo", "Daylight", "Daylight 2", "Clouds", "Clouds 2", "Gray", "Clear", "Canals", "Cobblestone", "Assault", "Clouds dark", "Night", "Night 2", "Night flat", "Dusty", "Rainy" });
 	config.visuals.effects.override_fog = effects->AddCheckBox("Override fog");
 	config.visuals.effects.fog_color = effects->AddColorPicker("Override fog");
 	config.visuals.effects.fog_start = effects->AddSliderInt("Fog start", 0, 1000, 200);
